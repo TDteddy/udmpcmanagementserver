@@ -1,0 +1,94 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.5'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id 'com.google.cloud.tools.jib' version '2.8.0'
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+}
+
+group = 'com.urban'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+//querydsl 추가 시작
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+	main.java.srcDir querydslDir
+}
+
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+//querydsl 추가 끝
+
+dependencies {
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.3'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.12.3'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.12.3'
+	implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'   //크롤링 서버 매핑을 위한 JsonMapping 라이브러리
+
+	implementation 'org.jetbrains:annotations:20.1.0'
+	implementation group: 'com.google.auth', name: 'google-auth-library-oauth2-http', version: '0.25.5'
+	implementation platform('com.google.cloud:libraries-bom:20.5.0')
+	compile 'com.google.cloud:google-cloud-storage'
+	compile 'com.google.apis:google-api-services-analyticsreporting:v4-rev20210106-1.31.5' // Reporting API
+	compile 'com.google.apis:google-api-services-analytics:v3-rev20190807-1.31.5' // Management API
+	compile 'com.google.analytics:google-analytics-admin:0.1.1' // Admin API
+	compile 'com.google.apis:google-api-services-tagmanager:v2-rev20210602-1.31.5' // gtm API
+
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation group: 'mysql', name: 'mysql-connector-java'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	implementation group: 'com.querydsl', name: 'querydsl-jpa', version: '5.0.0' // JPA QueryDSL
+	implementation group: 'com.querydsl', name: 'querydsl-core', version: '5.0.0' // JPA QueryDSL
+	implementation group: 'com.querydsl', name: 'querydsl-apt', version: '5.0.0' // QueryDSL 쿼리타입 생성
+
+// https://mvnrepository.com/artifact/org.jsoup/jsoup
+	implementation group: 'org.jsoup', name: 'jsoup', version: '1.14.2'
+
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
+	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.5'
+
+	// 스웩~
+	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.5.0'
+	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.5.0'
+
+//   runtimeOnly 'com.h2database:h2'
+}
+
+test {
+	useJUnitPlatform()
+}
+
+apply plugin: 'idea'
